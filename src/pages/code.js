@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Head from "next/head";
 
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -12,6 +12,7 @@ import { fetchCode } from "@/lib/services";
 
 const code = () => {
   const [result, setResult] = useState("");
+  const [isCode, setIsCode] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -21,6 +22,9 @@ const code = () => {
         if (e.data != "[DONE]") {
           let payload = JSON.parse(e.data);
           let text = payload.content;
+          if (text == "```" || text == "``") {
+            setIsCode((perv) => !perv);
+          }
           setResult((perv) => `${perv}${text}`);
         } else {
           source.close();
@@ -40,7 +44,7 @@ const code = () => {
         <ReactMarkdown
           rehypePlugins={[rehypeFormat]}
           remarkPlugins={[codeFrontmatter]}
-          children={result}
+          children={`${result}${isCode ? "```" : ""}`}
           components={{
             code({ node, className, children, ...props }) {
               const notBlock = ["manifest.json", "popup.html", "background.js"];

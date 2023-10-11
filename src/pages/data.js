@@ -13,7 +13,9 @@ export async function getServerSideProps({ req }) {
 
     return {
       props: {
-        data: result ? result : "<h1>Failed to fetch data!</h1>",
+        data: result
+          ? "<p><br/>test1<br/><i><b>test</b></i><br/><i><br/>test2</i></p>"
+          : "<h1>Failed to fetch data!</h1>",
       },
     };
   } catch (error) {
@@ -27,10 +29,23 @@ export async function getServerSideProps({ req }) {
 }
 
 const data = ({ data }) => {
-  //could use dompurify
-  const cleanHTML = data
-    .replace("<i>", "&lt;i&gt")
-    .replace("</i>", "&lt;/i&gt");
+  const splited = data.split("<i>");
+
+  const cleaArr = [];
+
+  splited.map((item) => {
+    if (item.includes("</i>")) {
+      const [withI, withoutI] = item.split("</i>");
+      cleaArr.push(
+        `<i>${withI}</i>`.replaceAll("<", "&lt;").replaceAll(">", "&gt")
+      );
+      cleaArr.push(withoutI);
+    } else {
+      cleaArr.push(item);
+    }
+  });
+
+  const cleanHTML = cleaArr.join("");
 
   return (
     <>
